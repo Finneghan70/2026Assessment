@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BC Learning Pathways — Assessment System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EF;--surface:#FFFFFF;--surface2:#EEECE7;--surface3:#E5E2DA;
+  --border:rgba(0,0,0,0.09);--border-md:rgba(0,0,0,0.16);--border-strong:rgba(0,0,0,0.25);
+  --text:#18160F;--text2:#5C5850;--text3:#9A9690;
+  --accent:#1E4D0F;--accent2:#2D7518;--accent-bg:#EBF4E6;
+  --lit:#3C3489;--lit-bg:#EEEDFE;--lit-mid:#7F77DD;
+  --math:#0C447C;--math-bg:#E6F1FB;--math-mid:#378ADD;
+  --inq:#27500A;--inq-bg:#EAF3DE;--inq-mid:#639922;
+  --arts:#72243E;--arts-bg:#FBEAF0;--arts-mid:#D4537E;
+  --phys:#085041;--phys-bg:#E1F5EE;--phys-mid:#1D9E75;
+  --em-bg:#FCEBEB;--em:#791F1F;--em-mid:#E24B4A;
+  --dev-bg:#FAEEDA;--dev:#633806;--dev-mid:#BA7517;
+  --pro-bg:#EAF3DE;--pro:#27500A;--pro-mid:#639922;
+  --ext-bg:#E6F1FB;--ext:#0C447C;--ext-mid:#378ADD;
+  --r:10px;--rsm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:500}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input,select,textarea{font-family:'DM Sans',sans-serif}
+
+/* ── HEADER ── */
+.app-hdr{background:var(--accent);color:#fff;padding:1.5rem 2rem 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.hdr-left .eyebrow{font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;opacity:.65;margin-bottom:5px}
+.hdr-left h1{font-size:26px;line-height:1.15;margin-bottom:4px;color:#fff}
+.hdr-left p{font-size:12.5px;opacity:.75;max-width:480px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.privacy-badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+
+/* ── NAV ── */
+.app-nav{background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;overflow-x:auto;padding:0 2rem}
+.nav-btn{background:none;border:none;border-bottom:2.5px solid transparent;padding:13px 15px 11px;font-size:13px;font-weight:400;color:var(--text2);white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px}
+.nav-btn.on{color:var(--text);border-bottom-color:var(--accent);font-weight:500}
+.nav-btn:hover:not(.on){color:var(--text);background:var(--bg)}
+
+/* ── LAYOUT ── */
+.main{max-width:1120px;padding:1.75rem 2rem}
+.view{display:none;animation:fadeIn .18s ease}
+.view.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ROSTER PANEL ── */
+.two-col{display:grid;grid-template-columns:240px 1fr;gap:1.25rem;align-items:start}
+.roster-panel{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+.roster-hdr{background:var(--surface2);padding:10px 13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.roster-hdr-title{font-size:12.5px;font-weight:500}
+.roster-list{list-style:none}
+.roster-item{padding:9px 13px;border-bottom:0.5px solid var(--border);cursor:pointer;font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:space-between;transition:background .12s}
+.roster-item:last-child{border-bottom:none}
+.roster-item:hover{background:var(--bg)}
+.roster-item.on{background:var(--accent-bg);color:var(--accent);font-weight:500}
+.roster-item .prof-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.add-student-btn{width:100%;background:none;border:none;border-top:0.5px solid var(--border);padding:9px 13px;font-size:12.5px;color:var(--accent2);text-align:left;display:flex;align-items:center;gap:5px;transition:background .12s}
+.add-student-btn:hover{background:var(--accent-bg)}
+
+/* ── STUDENT PROFILE ── */
+.profile-panel{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+.profile-hdr{padding:1.1rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.profile-name{font-size:18px;font-weight:500;font-family:'Fraunces',serif}
+.profile-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.profile-tabs{display:flex;padding:0 1.25rem;border-bottom:0.5px solid var(--border);background:var(--surface2);gap:0}
+.ptab{background:none;border:none;border-bottom:2px solid transparent;padding:9px 13px 8px;font-size:12.5px;color:var(--text2);white-space:nowrap;transition:all .12s}
+.ptab.on{color:var(--text);border-bottom-color:var(--accent);font-weight:500}
+.ptab:hover:not(.on){color:var(--text)}
+.profile-body{padding:1.1rem 1.25rem}
+.ptab-view{display:none}
+.ptab-view.on{display:block}
+
+/* ── PROFICIENCY PICKER ── */
+.prof-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.prof-btn{border:1.5px solid transparent;border-radius:var(--rsm);padding:6px 8px;font-size:11.5px;font-weight:500;text-align:center;transition:all .15s;background:var(--surface2);color:var(--text2)}
+.prof-btn:hover{border-color:var(--border-md)}
+.prof-btn.sel-E{background:var(--em-bg);color:var(--em);border-color:var(--em-mid)}
+.prof-btn.sel-D{background:var(--dev-bg);color:var(--dev);border-color:var(--dev-mid)}
+.prof-btn.sel-P{background:var(--pro-bg);color:var(--pro);border-color:var(--pro-mid)}
+.prof-btn.sel-X{background:var(--ext-bg);color:var(--ext);border-color:var(--ext-mid)}
+
+.skill-section{margin-bottom:1.25rem}
+.skill-label{font-size:11.5px;font-weight:500;color:var(--text2);margin-bottom:5px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.05em}
+.skill-label-dot{width:7px;height:7px;border-radius:50%}
+.skill-item{margin-bottom:10px;padding:9px 12px;border:0.5px solid var(--border);border-radius:var(--rsm);background:var(--bg)}
+.skill-name{font-size:12.5px;font-weight:500;margin-bottom:2px}
+.skill-desc{font-size:11.5px;color:var(--text2);margin-bottom:6px;line-height:1.5}
+
+/* ── NOTES ── */
+.notes-area{width:100%;min-height:80px;border:0.5px solid var(--border);border-radius:var(--rsm);padding:8px 10px;font-size:12.5px;color:var(--text);background:var(--surface);resize:vertical;line-height:1.5}
+.notes-area:focus{outline:none;border-color:var(--accent2)}
+.notes-area::placeholder{color:var(--text3)}
+.field-label{font-size:11.5px;font-weight:500;color:var(--text2);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.05em}
+.form-group{margin-bottom:.9rem}
+.text-input{width:100%;height:34px;border:0.5px solid var(--border);border-radius:var(--rsm);padding:0 10px;font-size:13px;color:var(--text);background:var(--surface)}
+.text-input:focus{outline:none;border-color:var(--accent2)}
+.select-input{width:100%;height:34px;border:0.5px solid var(--border);border-radius:var(--rsm);padding:0 8px;font-size:13px;color:var(--text);background:var(--surface)}
+.select-input:focus{outline:none;border-color:var(--accent2)}
+
+/* ── PROFICIENCY SCALE CARDS ── */
+.scale-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.scale-card{border-radius:var(--r);padding:.9rem 1rem;border:0.5px solid transparent}
+.sc-E{background:var(--em-bg);border-color:var(--em-mid);color:var(--em)}
+.sc-D{background:var(--dev-bg);border-color:var(--dev-mid);color:var(--dev)}
+.sc-P{background:var(--pro-bg);border-color:var(--pro-mid);color:var(--pro)}
+.sc-X{background:var(--ext-bg);border-color:var(--ext-mid);color:var(--ext)}
+.scale-card .sc-letter{font-family:'Fraunces',serif;font-size:24px;font-weight:700;line-height:1;margin-bottom:4px}
+.scale-card .sc-name{font-size:12.5px;font-weight:500;margin-bottom:4px}
+.scale-card .sc-def{font-size:11.5px;line-height:1.55}
+
+/* ── PROGRESS BAR ── */
+.prog-bar-wrap{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+
+/* ── BUTTONS ── */
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);padding:7px 16px;font-size:13px;font-weight:500;transition:opacity .15s}
+.btn-primary:hover{opacity:.88}
+.btn-ghost{background:none;border:0.5px solid var(--border-md);border-radius:var(--rsm);padding:6px 14px;font-size:12.5px;color:var(--text2);transition:background .15s}
+.btn-ghost:hover{background:var(--surface2)}
+.btn-danger{background:none;border:0.5px solid var(--em-mid);border-radius:var(--rsm);padding:5px 12px;font-size:12px;color:var(--em);transition:background .15s}
+.btn-danger:hover{background:var(--em-bg)}
+.btn-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+
+/* ── CONFERENCE PANELS ── */
+.conf-section{margin-bottom:1.5rem}
+.conf-section-title{font-size:14px;font-weight:500;font-family:'Fraunces',serif;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:0.5px solid var(--border)}
+.conf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.conf-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rsm);padding:.85rem 1rem}
+.conf-card-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:4px}
+.conf-card-value{font-size:13px;color:var(--text);line-height:1.5}
+.star-goals{list-style:none}
+.star-goals li{padding:6px 0;border-bottom:0.5px solid var(--border);font-size:12.5px;color:var(--text2);display:flex;align-items:flex-start;gap:6px;line-height:1.45}
+.star-goals li:last-child{border-bottom:none}
+.star-goals li::before{content:'→';color:var(--accent2);flex-shrink:0;margin-top:2px}
+
+/* ── OVERVIEW TABLE ── */
+.class-overview-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.class-overview-table th{text-align:left;padding:7px 10px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);background:var(--surface2);border-bottom:0.5px solid var(--border)}
+.class-overview-table td{padding:8px 10px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.class-overview-table tr:hover td{background:var(--bg)}
+.class-overview-table tr:last-child td{border-bottom:none}
+.prof-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.pb-E{background:var(--em-bg);color:var(--em)}
+.pb-D{background:var(--dev-bg);color:var(--dev)}
+.pb-P{background:var(--pro-bg);color:var(--pro)}
+.pb-X{background:var(--ext-bg);color:var(--ext)}
+.pb-na{background:var(--surface2);color:var(--text3)}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:var(--border-md)}
+.tl-entry{position:relative;margin-bottom:.85rem}
+.tl-dot{position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent2);border:2px solid var(--surface)}
+.tl-date{font-size:10.5px;color:var(--text3);margin-bottom:2px}
+.tl-note{font-size:12.5px;color:var(--text);line-height:1.5;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rsm);padding:7px 10px}
+
+/* ── MODAL ── */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-wrap.on{display:flex}
+.modal{background:var(--surface);border-radius:var(--r);padding:1.5rem;max-width:440px;width:90%;border:0.5px solid var(--border-md)}
+.modal h2{font-size:17px;margin-bottom:1rem;font-family:'Fraunces',serif;font-weight:500}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+
+/* ── NOTE BOX ── */
+.note-box{background:var(--surface);border:0.5px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--rsm);padding:10px 14px;font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem}
+.note-box strong{color:var(--text);font-weight:500}
+.divider{border:none;border-top:0.5px solid var(--border);margin:1.25rem 0}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.empty-state p{font-size:13.5px;margin-top:.5rem}
+.section-title{font-size:16px;font-weight:500;font-family:'Fraunces',serif;margin-bottom:.85rem;padding-bottom:.6rem;border-bottom:0.5px solid var(--border)}
+.chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;border:0.5px solid var(--border)}
+.save-toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:8px 16px;border-radius:var(--rsm);font-size:13px;opacity:0;transition:opacity .3s;z-index:2000}
+.save-toast.show{opacity:1}
+
+@media(max-width:700px){
+  .two-col{grid-template-columns:1fr}
+  .scale-grid{grid-template-columns:repeat(2,1fr)}
+  .conf-grid{grid-template-columns:1fr}
+  .app-hdr{padding:1.25rem}
+  .main{padding:1.1rem}
+  .app-nav{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="app-hdr">
+  <div class="hdr-left">
+    <div class="eyebrow">Grades 4 &amp; 5 · BC Learning Pathways · 2026–2027</div>
+    <h1>Assessment System</h1>
+    <p>Informal &amp; formal assessment · Student-led conferences · Parent &amp; teacher conferences · All data stored locally on this device only.</p>
+  </div>
+  <div class="hdr-right">
+    <div class="privacy-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Stored locally — no cloud, no server
+    </div>
+    <div class="privacy-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span id="export-hdr-btn" style="cursor:pointer" onclick="exportData()">Export backup</span>
+    </div>
+  </div>
+</div>
+
+<nav class="app-nav">
+  <button class="nav-btn on" onclick="setView('class',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Class overview
+  </button>
+  <button class="nav-btn" onclick="setView('student',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Student profiles
+  </button>
+  <button class="nav-btn" onclick="setView('conference',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Conference prep
+  </button>
+  <button class="nav-btn" onclick="setView('scale',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Proficiency scale
+  </button>
+  <button class="nav-btn" onclick="setView('pathways',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Learning Pathways
+  </button>
+</nav>
+
+<div class="main">
+
+<!-- ══════════ CLASS OVERVIEW ══════════ -->
+<div id="view-class" class="view on">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
+    <h2 class="section-title" style="margin:0;border:none;padding:0">Class overview</h2>
+    <div class="btn-row">
+      <select class="select-input" id="overview-filter" style="width:160px" onchange="renderOverview()">
+        <option value="all">All students</option>
+        <option value="literacy">Literacy focus</option>
+        <option value="math">Numeracy focus</option>
+        <option value="inquiry">Inquiry focus</option>
+      </select>
+      <button class="btn-primary" onclick="openAddModal()">+ Add student</button>
+    </div>
+  </div>
+  <div id="overview-container"></div>
+</div>
+
+<!-- ══════════ STUDENT PROFILES ══════════ -->
+<div id="view-student" class="view">
+  <div class="two-col">
+    <div class="roster-panel">
+      <div class="roster-hdr">
+        <span class="roster-hdr-title">Our team</span>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:11.5px" onclick="openAddModal()">+ Add</button>
+      </div>
+      <ul class="roster-list" id="roster-list"></ul>
+    </div>
+    <div id="profile-area">
+      <div class="empty-state">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <p>Select a student from the roster to view or edit their profile.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CONFERENCE PREP ══════════ -->
+<div id="view-conference" class="view">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
+    <h2 class="section-title" style="margin:0;border:none;padding:0">Conference preparation</h2>
+    <select class="select-input" id="conf-student-select" style="width:200px" onchange="renderConference()">
+      <option value="">— Select student —</option>
+    </select>
+  </div>
+  <div id="conf-area">
+    <div class="empty-state">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <p>Select a student to prepare a conference guide.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PROFICIENCY SCALE ══════════ -->
+<div id="view-scale" class="view">
+  <h2 class="section-title">BC proficiency scale — Grades 4 &amp; 5</h2>
+  <div class="scale-grid">
+    <div class="scale-card sc-E">
+      <div class="sc-letter">E</div>
+      <div class="sc-name">Emerging</div>
+      <div class="sc-def">Beginning to demonstrate knowledge and skills relevant to the expected learning. May be at initial stages of grade-level expectations, or working toward them.</div>
+    </div>
+    <div class="scale-card sc-D">
+      <div class="sc-letter">D</div>
+      <div class="sc-name">Developing</div>
+      <div class="sc-def">Demonstrating a partial understanding of the concepts and competencies relevant to the expected learning. Progressing toward expectations. <em>Not the same as failing.</em></div>
+    </div>
+    <div class="scale-card sc-P">
+      <div class="sc-letter">P</div>
+      <div class="sc-name">Proficient</div>
+      <div class="sc-def">Demonstrating a complete understanding of the concepts and competencies relevant to the expected learning. This is the target for all students.</div>
+    </div>
+    <div class="scale-card sc-X">
+      <div class="sc-letter">X</div>
+      <div class="sc-name">Extending</div>
+      <div class="sc-def">Demonstrating a sophisticated understanding that goes beyond the expected learning. Applying skills in novel and complex ways across contexts.</div>
+    </div>
+  </div>
+  <div class="note-box"><strong>Important for parent conferences:</strong> Proficient is the goal for every student — not Extending. "Developing at the beginning of the year is expected and healthy. All students move through the scale at different rates. The scale describes current performance, not a fixed label.</div>
+
+  <h2 class="section-title" style="margin-top:1.25rem">How to use the scale in conferences</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem">
+      <div style="font-weight:500;font-size:13px;margin-bottom:6px">Student-led conference</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">Students explain where they are on the scale for each area using their portfolio evidence. Teacher facilitates. Parent listens and asks questions. Student sets next goals.</div>
+    </div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem">
+      <div style="font-weight:500;font-size:13px;margin-bottom:6px">Teacher–parent conference</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">Use the conference prep view to generate a profile summary. Walk through the scale for each area. Share specific evidence from the portfolio. Agree on 2–3 next steps together.</div>
+    </div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem">
+      <div style="font-weight:500;font-size:13px;margin-bottom:6px">Informal check-in</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">Quick 1:1 during CAFE conferring or Math Daily 3 small group. Update the student's profile immediately after. These micro-assessments are the richest data in the system.</div>
+    </div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem">
+      <div style="font-weight:500;font-size:13px;margin-bottom:6px">FSA context (Grade 4)</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">The Foundation Skills Assessment uses the same Emerging–Extending scale. Results do not appear on report cards but can confirm or prompt revision of your proficiency judgements.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LEARNING PATHWAYS ══════════ -->
+<div id="view-pathways" class="view">
+  <h2 class="section-title">BC Learning Pathways — reference guide</h2>
+  <div class="note-box"><strong>How to use this view:</strong> These are the key skill areas from the K-4 Foundational Learning Progressions. Use them during CAFE conferring and Math Daily 3 observations to identify exactly where a student is and what their precise next step should be. These are a teacher tool — they are never used to label or sort students.</div>
+
+  <div style="display:flex;gap:8px;margin-bottom:1.1rem;flex-wrap:wrap">
+    <button class="btn-ghost pathway-tab on" onclick="setPathway('ela',this)">ELA — Literacy</button>
+    <button class="btn-ghost pathway-tab" onclick="setPathway('math',this)">Mathematics</button>
+    <button class="btn-ghost pathway-tab" onclick="setPathway('cross',this)">Cross-curricular</button>
+  </div>
+  <div id="pathway-ela" class="pathway-view on"></div>
+  <div id="pathway-math" class="pathway-view" style="display:none"></div>
+  <div id="pathway-cross" class="pathway-view" style="display:none"></div>
+</div>
+
+</div><!-- /.main -->
+
+<!-- ══════════ ADD STUDENT MODAL ══════════ -->
+<div class="modal-wrap" id="add-modal">
+  <div class="modal">
+    <h2>Add a team member</h2>
+    <div class="form-group">
+      <label class="field-label" for="new-name">First name (no last names stored)</label>
+      <input class="text-input" id="new-name" placeholder="e.g. Alex" maxlength="40">
+    </div>
+    <div class="form-group">
+      <label class="field-label" for="new-year">School year entry</label>
+      <select class="select-input" id="new-year">
+        <option value="2026">September 2026</option>
+        <option value="2027">January 2027</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="addStudent()">Add to team</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SAVE TOAST ══════════ -->
+<div class="save-toast" id="save-toast">Saved</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA SCHEMA & STORAGE
+═══════════════════════════════════════════════════ */
+const STORE_KEY = 'bcAssess_2026';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { students: [] }; }
+  catch(e) { return { students: [] }; }
+}
+function saveData(d) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(d));
+  showToast();
+}
+function showToast() {
+  const t = document.getElementById('save-toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* Proficiency labels */
+const PROF = {
+  E: { label: 'Emerging', short: 'E', cls: 'pb-E', dot: '#E24B4A' },
+  D: { label: 'Developing', short: 'D', cls: 'pb-D', dot: '#BA7517' },
+  P: { label: 'Proficient', short: 'P', cls: 'pb-P', dot: '#639922' },
+  X: { label: 'Extending', short: 'X', cls: 'pb-X', dot: '#378ADD' },
+  '': { label: '—', short: '—', cls: 'pb-na', dot: '#B4B2A9' }
+};
+const PROF_ORDER = ['', 'E', 'D', 'P', 'X'];
+const PROF_W = { '': 0, E: 1, D: 2, P: 3, X: 4 };
+
+/* Skill areas */
+const SKILLS = {
+  literacy: {
+    label: 'Literacy', color: '#7F77DD', bg: '#EEEDFE',
+    areas: [
+      { id: 'reading_comp', name: 'Reading comprehension', desc: 'Making meaning from texts — connections, inferences, determining importance, synthesizing across sources.' },
+      { id: 'reading_fluency', name: 'Reading fluency', desc: 'Reading with appropriate rate, expression, and accuracy. Phrasing matches punctuation and meaning.' },
+      { id: 'phonics_decoding', name: 'Phonics & decoding', desc: 'Using knowledge of letter-sound relationships, word parts (roots, affixes), and patterns to decode unfamiliar words.' },
+      { id: 'vocabulary', name: 'Vocabulary', desc: 'Using context clues, word structure, and prior knowledge to understand and use a range of vocabulary including subject-specific terms.' },
+      { id: 'writing_comp', name: 'Writing — composition', desc: 'Generating ideas, organising writing, developing a voice and sense of audience. Producing texts for different purposes and genres.' },
+      { id: 'writing_conv', name: 'Writing — conventions', desc: 'Punctuation, spelling, grammar, sentence structure, and paragraph organisation appropriate to grade-level expectations.' },
+      { id: 'oral_language', name: 'Oral language', desc: 'Expressing ideas clearly in discussion, sharing, and presentation. Listening actively and building on others\' ideas.' }
+    ]
+  },
+  numeracy: {
+    label: 'Numeracy', color: '#378ADD', bg: '#E6F1FB',
+    areas: [
+      { id: 'number_sense', name: 'Number sense', desc: 'Flexible understanding of numbers, quantities, and relationships. Representing numbers in multiple ways. Place value to 1 000 000+.' },
+      { id: 'comp_fluency', name: 'Computational fluency', desc: 'Efficient and accurate computation with whole numbers, decimals, and fractions. Understanding how operations change numbers.' },
+      { id: 'fractions_dec', name: 'Fractions & decimals', desc: 'Understanding equivalence, ordering, and operations with fractions and decimals. Connecting to real-world contexts.' },
+      { id: 'patterning', name: 'Patterning & algebraic thinking', desc: 'Recognising, describing, and extending patterns. Using variables. Understanding the relationship between quantities.' },
+      { id: 'geometry_meas', name: 'Geometry & measurement', desc: 'Properties of 2D shapes and 3D objects. Area, perimeter, volume. Angles. Coordinate grids. Metric conversion.' },
+      { id: 'data_prob', name: 'Data & probability', desc: 'Collecting, displaying, and interpreting data. Mean, median, mode. Understanding probability language and experiments.' },
+      { id: 'financial', name: 'Financial literacy', desc: 'Budgeting, saving, and spending decisions. Canadian currency. Percents and discounts in real-world contexts.' },
+      { id: 'math_reasoning', name: 'Mathematical reasoning & communication', desc: 'Explaining and justifying thinking in writing and orally. Using mathematical language precisely. Connecting concepts across contexts.' }
+    ]
+  },
+  inquiry: {
+    label: 'Inquiry & core competencies', color: '#639922', bg: '#EAF3DE',
+    areas: [
+      { id: 'questioning', name: 'Questioning & predicting', desc: 'Asking relevant questions, making predictions, and developing curiosity across all subject areas.' },
+      { id: 'observing', name: 'Observing & recording', desc: 'Making careful observations, recording data accurately, and organising evidence from investigations and field study.' },
+      { id: 'critical_thinking', name: 'Critical & reflective thinking', desc: 'Analysing evidence, evaluating multiple perspectives (including Indigenous worldviews), and drawing reasoned conclusions.' },
+      { id: 'creative', name: 'Creative thinking', desc: 'Generating novel ideas, taking creative risks, and producing original work across literacy, arts, and ADST contexts.' },
+      { id: 'communicating', name: 'Communicating', desc: 'Sharing learning clearly for different audiences and purposes — writing, speaking, visual art, digital, and multimodal texts.' },
+      { id: 'social_resp', name: 'Social responsibility', desc: 'Contributing to the classroom community, demonstrating care for others, and taking action for the common good.' }
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+let data = loadData();
+let activeStudentId = null;
+let activeProfileTab = 'literacy';
+
+function getStudent(id) { return data.students.find(s => s.id === id); }
+function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+/* ═══════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════ */
+function setView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('view-' + id).classList.add('on');
+  if (btn) btn.classList.add('on');
+  if (id === 'class') renderOverview();
+  if (id === 'student') { renderRoster(); if (activeStudentId) renderProfile(activeStudentId); }
+  if (id === 'conference') { renderConfSelect(); }
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════ */
+function openAddModal() { document.getElementById('add-modal').classList.add('on'); document.getElementById('new-name').focus(); }
+function closeModal() { document.getElementById('add-modal').classList.remove('on'); document.getElementById('new-name').value = ''; }
+function addStudent() {
+  const name = document.getElementById('new-name').value.trim();
+  if (!name) { alert('Please enter a name.'); return; }
+  const student = {
+    id: newId(),
+    name,
+    year: document.getElementById('new-year').value,
+    created: new Date().toISOString(),
+    scores: {},
+    notes: {},
+    conferenceNotes: [],
+    teacherNotes: '',
+    strengths: '',
+    goals: '',
+    nextSteps: ''
+  };
+  data.students.push(student);
+  saveData(data);
+  closeModal();
+  renderRoster();
+  renderOverview();
+  renderConfSelect();
+  selectStudent(student.id);
+  setView('student', document.querySelector('.nav-btn:nth-child(2)'));
+}
+
+/* ═══════════════════════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════════════════════ */
+function renderOverview() {
+  const filter = document.getElementById('overview-filter')?.value || 'all';
+  const container = document.getElementById('overview-container');
+  if (!data.students.length) {
+    container.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No students yet. Add your first team member to get started.</p><br><button class="btn-primary" onclick="openAddModal()">+ Add first student</button></div>`;
+    return;
+  }
+  const areas = filter === 'all'
+    ? [...SKILLS.literacy.areas.slice(0,4), ...SKILLS.numeracy.areas.slice(0,4), ...SKILLS.inquiry.areas.slice(0,3)]
+    : filter === 'literacy' ? SKILLS.literacy.areas
+    : filter === 'math' ? SKILLS.numeracy.areas
+    : SKILLS.inquiry.areas;
+
+  const cols = areas.map(a => `<th style="min-width:80px">${a.name.length > 18 ? a.name.slice(0,16)+'…' : a.name}</th>`).join('');
+  const rows = data.students.map(s => {
+    const cells = areas.map(a => {
+      const v = s.scores[a.id] || '';
+      const p = PROF[v] || PROF[''];
+      return `<td style="text-align:center"><span class="prof-badge ${p.cls}">${v || '–'}</span></td>`;
+    }).join('');
+    const overall = getOverallProficiency(s);
+    const op = PROF[overall] || PROF[''];
+    return `<tr onclick="goToStudent('${s.id}')" style="cursor:pointer">
+      <td style="font-weight:500">${s.name}</td>
+      <td><span class="prof-badge ${op.cls}">${overall || '–'}</span></td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<div style="overflow-x:auto;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r)">
+    <table class="class-overview-table">
+      <thead><tr><th>Student</th><th>Overall</th>${cols}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function getOverallProficiency(s) {
+  const all = Object.values(s.scores).filter(v => v);
+  if (!all.length) return '';
+  const avg = all.reduce((acc, v) => acc + (PROF_W[v] || 0), 0) / all.length;
+  if (avg >= 3.5) return 'X';
+  if (avg >= 2.5) return 'P';
+  if (avg >= 1.5) return 'D';
+  return 'E';
+}
+
+function goToStudent(id) {
+  setView('student', document.querySelector('.nav-btn:nth-child(2)'));
+  selectStudent(id);
+}
+
+/* ═══════════════════════════════════════════════════
+   ROSTER & PROFILE
+═══════════════════════════════════════════════════ */
+function renderRoster() {
+  const list = document.getElementById('roster-list');
+  if (!list) return;
+  if (!data.students.length) {
+    list.innerHTML = `<li style="padding:10px 13px;font-size:12.5px;color:var(--text3);font-style:italic">No students yet</li>`;
+    return;
+  }
+  list.innerHTML = data.students.map(s => {
+    const ov = getOverallProficiency(s);
+    const dot = (PROF[ov] || PROF['']).dot;
+    return `<li class="roster-item ${s.id === activeStudentId ? 'on' : ''}" onclick="selectStudent('${s.id}')">
+      ${s.name}
+      <span class="prof-dot" style="background:${dot}"></span>
+    </li>`;
+  }).join('') + `<li style="padding:0"><button class="add-student-btn" onclick="openAddModal()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Add student
+  </button></li>`;
+}
+
+function selectStudent(id) {
+  activeStudentId = id;
+  renderRoster();
+  renderProfile(id);
+}
+
+function renderProfile(id) {
+  const s = getStudent(id);
+  const area = document.getElementById('profile-area');
+  if (!s) { area.innerHTML = ''; return; }
+
+  const ov = getOverallProficiency(s);
+  const op = PROF[ov] || PROF[''];
+
+  area.innerHTML = `<div class="profile-panel">
+    <div class="profile-hdr">
+      <div>
+        <div class="profile-name">${s.name}</div>
+        <div class="profile-meta">Joined ${s.year === '2026' ? 'September 2026' : 'January 2027'} &nbsp;·&nbsp; Overall: <span class="prof-badge ${op.cls}" style="font-size:12px">${ov ? op.label : 'Not yet assessed'}</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="addConferenceNote('${id}')">+ Conference note</button>
+        <button class="btn-danger" onclick="deleteStudent('${id}')">Remove</button>
+      </div>
+    </div>
+    <div class="profile-tabs">
+      <button class="ptab ${activeProfileTab==='literacy'?'on':''}" onclick="setProfileTab('literacy','${id}')">Literacy</button>
+      <button class="ptab ${activeProfileTab==='numeracy'?'on':''}" onclick="setProfileTab('numeracy','${id}')">Numeracy</button>
+      <button class="ptab ${activeProfileTab==='inquiry'?'on':''}" onclick="setProfileTab('inquiry','${id}')">Inquiry &amp; competencies</button>
+      <button class="ptab ${activeProfileTab==='notes'?'on':''}" onclick="setProfileTab('notes','${id}')">Notes &amp; history</button>
+    </div>
+    <div class="profile-body">
+      <div id="ptv-literacy" class="ptab-view ${activeProfileTab==='literacy'?'on':''}"></div>
+      <div id="ptv-numeracy" class="ptab-view ${activeProfileTab==='numeracy'?'on':''}"></div>
+      <div id="ptv-inquiry" class="ptab-view ${activeProfileTab==='inquiry'?'on':''}"></div>
+      <div id="ptv-notes" class="ptab-view ${activeProfileTab==='notes'?'on':''}"></div>
+    </div>
+  </div>`;
+
+  renderSkillTab('literacy', id, SKILLS.literacy, 'ptv-literacy');
+  renderSkillTab('numeracy', id, SKILLS.numeracy, 'ptv-numeracy');
+  renderSkillTab('inquiry', id, SKILLS.inquiry, 'ptv-inquiry');
+  renderNotesTab(id, 'ptv-notes');
+}
+
+function setProfileTab(tab, id) {
+  activeProfileTab = tab;
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('on'));
+  event.target.classList.add('on');
+  document.querySelectorAll('.ptab-view').forEach(v => v.classList.remove('on'));
+  document.getElementById('ptv-' + tab).classList.add('on');
+}
+
+function renderSkillTab(tabId, studentId, skillGroup, containerId) {
+  const s = getStudent(studentId);
+  const container = document.getElementById(containerId);
+  if (!container || !s) return;
+  const html = skillGroup.areas.map(area => {
+    const current = s.scores[area.id] || '';
+    const profBtns = ['E','D','P','X'].map(p =>
+      `<button class="prof-btn ${current===p?'sel-'+p:''}" onclick="setScore('${studentId}','${area.id}','${p}')">${PROF[p].label}</button>`
+    ).join('');
+    const progWidth = current ? (PROF_W[current]/4*100) : 0;
+    const progColor = current==='E'?'#E24B4A':current==='D'?'#BA7517':current==='P'?'#639922':'#378ADD';
+    return `<div class="skill-item">
+      <div class="skill-name">${area.name}</div>
+      <div class="skill-desc">${area.desc}</div>
+      <div class="prof-row">${profBtns}</div>
+      <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${progWidth}%;background:${progColor}"></div></div>
+    </div>`;
+  }).join('');
+  const noteKey = tabId + '_note';
+  const noteVal = s.notes[noteKey] || '';
+  container.innerHTML = `<div style="margin-bottom:1rem">${html}</div>
+    <div class="form-group">
+      <label class="field-label">Observation notes — ${skillGroup.label}</label>
+      <textarea class="notes-area" placeholder="CAFE conferring notes, running record observations, small group notes…" onchange="saveNote('${studentId}','${noteKey}',this.value)">${noteVal}</textarea>
+    </div>`;
+}
+
+function renderNotesTab(studentId, containerId) {
+  const s = getStudent(studentId);
+  const container = document.getElementById(containerId);
+  if (!container || !s) return;
+  const tl = (s.conferenceNotes || []).slice().reverse().map(n =>
+    `<div class="tl-entry">
+      <div class="tl-dot"></div>
+      <div class="tl-date">${n.type} &nbsp;·&nbsp; ${new Date(n.date).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'})}</div>
+      <div class="tl-note">${n.text || '<em style="color:var(--text3)">No note recorded</em>'}</div>
+    </div>`
+  ).join('') || '<p style="color:var(--text3);font-size:12.5px;font-style:italic">No conference notes yet.</p>';
+
+  container.innerHTML = `
+    <div class="form-group"><label class="field-label">Strengths (for conferences &amp; report card language)</label>
+      <textarea class="notes-area" style="min-height:60px" placeholder="What is this student genuinely good at? What lights them up?" onchange="saveField('${studentId}','strengths',this.value)">${s.strengths||''}</textarea></div>
+    <div class="form-group"><label class="field-label">Current goals</label>
+      <textarea class="notes-area" style="min-height:60px" placeholder="Student's own goals (written in their voice if possible)" onchange="saveField('${studentId}','goals',this.value)">${s.goals||''}</textarea></div>
+    <div class="form-group"><label class="field-label">Next steps (teacher)</label>
+      <textarea class="notes-area" style="min-height:60px" placeholder="Specific, actionable next instructional steps from Learning Pathways" onchange="saveField('${studentId}','nextSteps',this.value)">${s.nextSteps||''}</textarea></div>
+    <div class="form-group"><label class="field-label">Confidential teacher notes</label>
+      <textarea class="notes-area" placeholder="Additional context, IEP notes, family communication log…" onchange="saveField('${studentId}','teacherNotes',this.value)">${s.teacherNotes||''}</textarea></div>
+    <div class="divider"></div>
+    <div class="conf-section-title">Conference &amp; assessment history</div>
+    <div class="timeline">${tl}</div>`;
+}
+
+function setScore(studentId, areaId, prof) {
+  const s = getStudent(studentId);
+  if (!s) return;
+  s.scores[areaId] = s.scores[areaId] === prof ? '' : prof;
+  saveData(data);
+  renderRoster();
+  renderSkillTab(
+    areaId in SKILLS.literacy.areas.map(a=>a.id) ? 'literacy'
+    : areaId in SKILLS.numeracy.areas.map(a=>a.id) ? 'numeracy' : 'inquiry',
+    studentId,
+    activeProfileTab === 'numeracy' ? SKILLS.numeracy : activeProfileTab === 'inquiry' ? SKILLS.inquiry : SKILLS.literacy,
+    'ptv-' + activeProfileTab
+  );
+  const btn = event.target;
+  document.querySelectorAll(`[onclick*="'${areaId}'"]`).forEach(b => {
+    const p = b.getAttribute('onclick').match(/'([EDPX])'\)/)?.[1];
+    b.className = 'prof-btn' + (s.scores[areaId] === p ? ' sel-' + p : '');
+  });
+  const items = document.querySelectorAll('.skill-item');
+  items.forEach(item => {
+    const btns = item.querySelectorAll('.prof-btn');
+    if (btns.length && btns[0].getAttribute('onclick')?.includes(`'${areaId}'`)) {
+      const fill = item.querySelector('.prog-bar-fill');
+      if (fill) {
+        const v = s.scores[areaId];
+        const w = v ? (PROF_W[v]/4*100) : 0;
+        const c = v==='E'?'#E24B4A':v==='D'?'#BA7517':v==='P'?'#639922':'#378ADD';
+        fill.style.width = w + '%';
+        fill.style.background = c;
+      }
+    }
+  });
+}
+
+function saveNote(studentId, key, val) {
+  const s = getStudent(studentId);
+  if (!s) return;
+  if (!s.notes) s.notes = {};
+  s.notes[key] = val;
+  saveData(data);
+}
+function saveField(studentId, field, val) {
+  const s = getStudent(studentId);
+  if (!s) return;
+  s[field] = val;
+  saveData(data);
+}
+function deleteStudent(id) {
+  if (!confirm('Remove this student? Their data will be permanently deleted from this device.')) return;
+  data.students = data.students.filter(s => s.id !== id);
+  if (activeStudentId === id) activeStudentId = null;
+  saveData(data);
+  renderRoster();
+  renderOverview();
+  renderConfSelect();
+  document.getElementById('profile-area').innerHTML = `<div class="empty-state"><p>Select a student from the roster.</p></div>`;
+}
+
+function addConferenceNote(studentId) {
+  const types = ['CAFE conferring (informal)','Math Daily 3 (informal)','Student-led conference','Teacher–parent conference','FSA follow-up','Progress check','Other'];
+  const type = prompt('Conference type:\n' + types.map((t,i)=>`${i+1}. ${t}`).join('\n') + '\n\nEnter number:');
+  if (!type) return;
+  const idx = parseInt(type) - 1;
+  const typeLabel = types[idx] || 'Note';
+  const note = prompt(`Note for ${typeLabel}:`);
+  if (note === null) return;
+  const s = getStudent(studentId);
+  if (!s.conferenceNotes) s.conferenceNotes = [];
+  s.conferenceNotes.push({ date: new Date().toISOString(), type: typeLabel, text: note });
+  saveData(data);
+  renderNotesTab(studentId, 'ptv-notes');
+  if (activeProfileTab !== 'notes') {
+    activeProfileTab = 'notes';
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('on'));
+    document.querySelectorAll('.ptab').forEach(b => { if (b.textContent.includes('Notes')) b.classList.add('on'); });
+    document.querySelectorAll('.ptab-view').forEach(v => v.classList.remove('on'));
+    document.getElementById('ptv-notes').classList.add('on');
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   CONFERENCE VIEW
+═══════════════════════════════════════════════════ */
+function renderConfSelect() {
+  const sel = document.getElementById('conf-student-select');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select student —</option>' +
+    data.students.map(s => `<option value="${s.id}" ${s.id===cur?'selected':''}>${s.name}</option>`).join('');
+}
+function renderConference() {
+  const id = document.getElementById('conf-student-select').value;
+  const area = document.getElementById('conf-area');
+  if (!id) { area.innerHTML = `<div class="empty-state"><p>Select a student to generate a conference guide.</p></div>`; return; }
+  const s = getStudent(id);
+  if (!s) return;
+
+  const allAreas = [...SKILLS.literacy.areas, ...SKILLS.numeracy.areas, ...SKILLS.inquiry.areas];
+  const strengths = allAreas.filter(a => s.scores[a.id] === 'P' || s.scores[a.id] === 'X');
+  const developing = allAreas.filter(a => s.scores[a.id] === 'E' || s.scores[a.id] === 'D');
+  const notAssessed = allAreas.filter(a => !s.scores[a.id]);
+
+  const profCards = (list, prefix) => list.length
+    ? list.map(a => {
+        const v = s.scores[a.id] || '';
+        const p = PROF[v] || PROF[''];
+        return `<div class="conf-card">
+          <div class="conf-card-label">${prefix} &nbsp;<span class="prof-badge ${p.cls}" style="font-size:10px">${p.label || '—'}</span></div>
+          <div class="conf-card-value" style="font-weight:500">${a.name}</div>
+          <div style="font-size:11.5px;color:var(--text2);margin-top:3px;line-height:1.45">${a.desc}</div>
+        </div>`;
+      }).join('')
+    : `<div style="font-size:12.5px;color:var(--text3);font-style:italic;padding:.5rem 0">None in this category yet.</div>`;
+
+  const ov = getOverallProficiency(s);
+  const op = PROF[ov] || PROF[''];
+  const confHistory = (s.conferenceNotes || []).slice(-3).reverse();
+  const tlHtml = confHistory.length
+    ? confHistory.map(n => `<div class="tl-entry"><div class="tl-dot"></div>
+        <div class="tl-date">${n.type} · ${new Date(n.date).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}</div>
+        <div class="tl-note">${n.text}</div></div>`).join('')
+    : '<p style="color:var(--text3);font-size:12px;font-style:italic">No prior conference notes.</p>';
+
+  area.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
+      <div>
+        <span style="font-family:\'Fraunces\',serif;font-size:20px;font-weight:500">${s.name}</span>
+        &nbsp;<span class="prof-badge ${op.cls}">${ov ? op.label : 'Not yet assessed'}</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="printConference('${id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="conf-section">
+      <div class="conf-section-title">Strengths to celebrate &amp; evidence to share</div>
+      <div class="conf-grid">${profCards(strengths, 'Proficient / Extending')}</div>
+      ${s.strengths ? `<div class="note-box"><strong>Teacher notes on strengths:</strong> ${s.strengths}</div>` : ''}
+    </div>
+
+    <div class="conf-section">
+      <div class="conf-section-title">Areas of growth &amp; next steps</div>
+      <div class="conf-grid">${profCards(developing, 'Emerging / Developing')}</div>
+      ${s.nextSteps ? `<div class="note-box"><strong>Next steps (from Learning Pathways):</strong> ${s.nextSteps}</div>` : ''}
+    </div>
+
+    <div class="conf-section">
+      <div class="conf-section-title">Student's goals</div>
+      <div class="note-box">${s.goals || '<em style="color:var(--text3)">No goals recorded yet — co-create these with the student during the conference.</em>'}</div>
+    </div>
+
+    <div class="conf-section">
+      <div class="conf-section-title">Conference talking points</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div class="field-label" style="margin-bottom:6px">For a student-led conference</div>
+          <ul class="star-goals">
+            <li>What is something you are really proud of this term?</li>
+            <li>Show me one piece of work that shows your ${strengths[0]?.name || 'growth'} — explain it in your own words.</li>
+            <li>What is one thing that feels tricky right now?</li>
+            <li>What is your goal for next term? What will you do to get there?</li>
+            <li>What do you want your family to know about your learning?</li>
+          </ul>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom:6px">For a teacher–parent conference</div>
+          <ul class="star-goals">
+            <li>What have you noticed about ${s.name} at home this term?</li>
+            <li>Share 2–3 pieces of portfolio evidence. Explain the proficiency scale clearly.</li>
+            <li>Describe the next instructional steps and how families can support at home.</li>
+            <li>Ask about the student's wellbeing — sleep, friendships, attitude toward school.</li>
+            <li>Set 2–3 shared goals. Write them down and give families a copy.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="conf-section">
+      <div class="conf-section-title">Recent assessment history</div>
+      <div class="timeline">${tlHtml}</div>
+    </div>`;
+}
+
+function printConference(id) {
+  window.print();
+}
+
+/* ═══════════════════════════════════════════════════
+   LEARNING PATHWAYS CONTENT
+═══════════════════════════════════════════════════ */
+const elaPathways = [
+  { area:'Reading', color:'#7F77DD', bg:'#EEEDFE', skills:[
+    { name:'Phonics & decoding', gr4:'Applies knowledge of consonant clusters, vowel teams, long/short vowel patterns, common prefixes and suffixes. Decodes multi-syllable words by identifying recognisable parts.', gr5:'Uses knowledge of Greek and Latin roots, more complex affixes, and context clues together to decode and confirm meaning of unfamiliar words.' },
+    { name:'Reading fluency', gr4:'Reads grade-appropriate texts aloud with expression and appropriate pace. Self-corrects when meaning breaks down. Re-reads for fluency.', gr5:'Reads a wider range of text types fluently. Adjusts rate and expression for different text purposes (e.g. poetry vs informational). Reads silently for extended periods.' },
+    { name:'Comprehension — during reading', gr4:'Uses think-aloud strategies: makes connections, asks questions, visualises, identifies important ideas. Distinguishes fact from opinion.', gr5:'Makes inferences, synthesises across sections of a text, analyses how text features support meaning. Begins to evaluate author\'s purpose and perspective.' },
+    { name:'Comprehension — text to text/world', gr4:'Connects texts to personal experience, other texts, and world knowledge. Identifies theme and key messages.', gr5:'Compares multiple texts on the same topic. Evaluates credibility of sources. Considers how historical and cultural context shapes texts — including Indigenous perspectives.' }
+  ]},
+  { area:'Writing', color:'#7F77DD', bg:'#EEEDFE', skills:[
+    { name:'Writing process', gr4:'Plans using graphic organisers or notes. Drafts, revises for clarity and detail, edits for conventions. Produces a final copy. Understands writing for different purposes.', gr5:'Extends through the full writing process with more independence. Sets writing goals and self-assesses against criteria. Experiments with voice and style.' },
+    { name:'Composition — narrative', gr4:'Writes personal narratives with a clear beginning, middle, and end. Develops characters and setting. Uses descriptive detail.', gr5:'Creates narratives with developed characters, rising action and resolution. Uses literary devices deliberately (e.g. foreshadowing, figurative language).' },
+    { name:'Composition — informational', gr4:'Organises informational writing with an introduction, body paragraphs with supporting detail, and a conclusion. Uses subject-specific vocabulary. Includes text features (headings, labels).', gr5:'Synthesises information from multiple sources. Cites sources. Analyses as well as describes. Writes for a specific audience and adjusts register.' },
+    { name:'Conventions', gr4:'Punctuates sentences correctly (comma, question mark, exclamation mark). Uses apostrophes for contractions and simple possession. Spells common grade-level words. Paragraphs with one main idea.', gr5:'Uses quotation marks for dialogue. More complex sentence structures (subordinate clauses, relative clauses). Edits independently using a checklist. Stronger spelling of subject-specific vocabulary.' }
+  ]},
+  { area:'Oral language', color:'#7F77DD', bg:'#EEEDFE', skills:[
+    { name:'Speaking & presenting', gr4:'Shares ideas in class discussions, explains thinking clearly, uses appropriate vocabulary. Makes simple presentations with some preparation.', gr5:'Constructs and supports arguments with evidence. Adjusts language for audience. Delivers prepared presentations confidently with eye contact and pace.' },
+    { name:'Listening & responding', gr4:'Listens attentively and asks clarifying questions. Builds on others\' ideas in discussion. Identifies main ideas from spoken texts.', gr5:'Evaluates what they hear for evidence and reasoning. Responds thoughtfully and respectfully to differing perspectives. Participates in Socratic seminars.' }
+  ]}
+];
+
+const mathPathways = [
+  { area:'Number sense & operations', color:'#378ADD', bg:'#E6F1FB', skills:[
+    { name:'Place value', gr4:'Reads, writes, and represents whole numbers to 1 000 000. Compares and orders numbers. Understands the value of each digit.', gr5:'Extends to 1 000 000 000. Applies place value understanding to estimation and rounding in real-world contexts.' },
+    { name:'Multiplication & division', gr4:'Demonstrates multiplication and division facts to 100 with efficiency. Applies strategies for multi-digit multiplication (area model, standard algorithm). Division with remainders.', gr5:'Multi-digit multiplication and division with fluency. Connects to ratio and proportional reasoning.' },
+    { name:'Fractions', gr4:'Identifies and compares fractions with like and unlike denominators. Adds and subtracts fractions with like denominators. Connects fractions to decimals (tenths, hundredths).', gr5:'Adds and subtracts fractions with unlike denominators. Multiplies fractions by whole numbers. Connects to ratio, percent, and proportional reasoning.' },
+    { name:'Decimals', gr4:'Reads, writes, and orders decimals to hundredths. Adds and subtracts decimals in context.', gr5:'Extends to thousandths. Multiplies and divides decimals in contextual problems. Connects to percents and financial literacy.' }
+  ]},
+  { area:'Patterns & algebra', color:'#378ADD', bg:'#E6F1FB', skills:[
+    { name:'Patterns & variables', gr4:'Identifies rules for increasing and decreasing patterns. Represents patterns using tables and graphs. Introduces the concept of a variable.', gr5:'Uses variables in equations. Solves one-step equations. Connects patterns to proportional relationships.' }
+  ]},
+  { area:'Geometry & measurement', color:'#378ADD', bg:'#E6F1FB', skills:[
+    { name:'Geometry', gr4:'Classifies triangles and quadrilaterals by properties. Measures and compares angles. Identifies lines of symmetry.', gr5:'Performs and describes transformations (translation, reflection, rotation). Uses a coordinate grid. Connects 3D shapes to 2D nets.' },
+    { name:'Measurement', gr4:'Calculates area and perimeter of rectangles. Converts between metric units. Calculates elapsed time.', gr5:'Calculates area of triangles and parallelograms. Calculates volume of rectangular prisms. Applies measurement in real-world inquiry contexts.' }
+  ]},
+  { area:'Data & financial literacy', color:'#378ADD', bg:'#E6F1FB', skills:[
+    { name:'Data literacy', gr4:'Creates and interprets double bar graphs. Calculates mean. Describes probability using language (likely, unlikely, certain, impossible).', gr5:'Creates and interprets line graphs and scatter plots. Calculates mean, median, and mode. Conducts probability experiments and compares theoretical to experimental probability.' },
+    { name:'Financial literacy', gr4:'Makes change using Canadian currency. Applies addition and subtraction in financial contexts. Understands simple budgeting.', gr5:'Calculates discounts and percents. Applies ratio to financial contexts. Creates a simple budget for a real purpose (e.g. exhibition planning).' }
+  ]}
+];
+
+const crossPathways = [
+  { area:'Literacy across the curriculum', color:'#639922', bg:'#EAF3DE', skills:[
+    { name:'Reading to learn', gr4:'Uses comprehension strategies (questioning, determining importance, making connections) when reading non-fiction texts in Science, Social Studies, and ADST.', gr5:'Evaluates multiple sources on the same topic. Distinguishes fact from opinion. Analyses how perspective shapes an informational text.' },
+    { name:'Writing to communicate', gr4:'Uses writing to explain thinking in Science (lab reports, observation journals) and Social Studies (research responses, point-of-view writing).', gr5:'Writes to persuade, synthesise, and argue across subject areas. Uses evidence from research to support claims. Cites sources appropriately.' },
+    { name:'Oral language across subjects', gr4:'Participates in science discussions, presents inquiry findings, explains mathematical thinking orally.', gr5:'Defends positions with evidence in socials discussions. Explains mathematical reasoning in Math Writing. Presents capstone exhibition to a real audience.' }
+  ]},
+  { area:'Numeracy across the curriculum', color:'#639922', bg:'#EAF3DE', skills:[
+    { name:'Numeracy in Science', gr4:'Collects, records, and graphs data from science investigations. Uses measurement accurately. Makes predictions based on data patterns.', gr5:'Calculates averages from weather or ecosystem data. Interprets graphs and draws evidence-based conclusions. Applies proportional reasoning to science contexts.' },
+    { name:'Numeracy in Social Studies', gr4:'Reads and creates timelines. Interprets maps using scale. Works with historical dates and durations.', gr5:'Analyses historical population and immigration data. Calculates economic comparisons (e.g. wage gaps). Creates and interprets data displays about social issues.' },
+    { name:'Numeracy in ADST & financial contexts', gr4:'Applies measurement in design challenges. Uses basic financial calculations in classroom economy activities.', gr5:'Budgets for real projects (e.g. exhibition display). Calculates material costs. Applies ratio and proportion in design and construction.' }
+  ]}
+];
+
+function setPathway(id, btn) {
+  document.querySelectorAll('.pathway-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.pathway-view').forEach(v => v.style.display = 'none');
+  document.getElementById('pathway-' + id).style.display = 'block';
+}
+
+function renderPathway(containerId, pathways) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = pathways.map(section => `
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:14px;font-weight:500;font-family:\'Fraunces\',serif;color:${section.color};margin-bottom:.75rem;display:flex;align-items:center;gap:8px">
+        <span style="width:10px;height:10px;border-radius:50%;background:${section.color};flex-shrink:0;display:inline-block"></span>
+        ${section.area}
+      </div>
+      ${section.skills.map(skill => `
+        <div style="background:${section.bg};border:0.5px solid ${section.color}40;border-radius:var(--rsm);padding:.85rem 1rem;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:500;color:${section.color};margin-bottom:.6rem">${skill.name}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;color:var(--text)">
+            <div><div style="font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:${section.color};opacity:.8;margin-bottom:3px">Grade 4 proficiency</div>${skill.gr4}</div>
+            <div><div style="font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:${section.color};opacity:.8;margin-bottom:3px">Grade 5 proficiency</div>${skill.gr5}</div>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   EXPORT / IMPORT
+═══════════════════════════════════════════════════ */
+function exportData() {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bcassess-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+renderPathway('pathway-ela', elaPathways);
+renderPathway('pathway-math', mathPathways);
+renderPathway('pathway-cross', crossPathways);
+renderRoster();
+renderOverview();
+renderConfSelect();
+</script>
+</body>
+</html>
